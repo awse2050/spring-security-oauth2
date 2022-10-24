@@ -3,7 +3,9 @@ package io.security.oauth2.springsecurityoauth2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,14 +25,21 @@ public class SecurityConfig {
      */
     @Bean
     @Order(0)
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChainByBasicAuthentication(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().authenticated();
-        http.httpBasic();
+        http.httpBasic().authenticationEntryPoint((request, response, authException) -> {
+            System.out.println("http Basic EntryPoint");
+            response.addHeader("WWW-Authenticate", "Basic realm=localhost");
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        });
+        // 세션 미사용방식 -> 인증 이후 SecurityContext 활용 불가
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
 //        http.apply(new CustomSecurityConfigurer().setFlag(true));
         return http.build();
     }
 
-    @Bean
+//    @Bean
     @Order(1)
     SecurityFilterChain securityFilterChain2(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().authenticated();
@@ -39,7 +48,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
+//    @Bean
     @Order(2)
     SecurityFilterChain securityFilterChain3(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().authenticated();
