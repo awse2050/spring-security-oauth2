@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Configuration
+//@Configuration
 public class SecurityConfig {
 
     // WebSecurityConfigurer 가 Deprecated되면서 Bean을 생성해서 사용하는 방식으로 변경되었다.
